@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel Rodríguez · Dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #050505;
+    --surface: #0f0f0f;
+    --border: #2c2c2c;
+    --accent: #d4f500;
+    --accent2: #ff4d00;
+    --text: #f8f8f8;
+    --muted: #909090;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(5,5,5,0.97), transparent);
+  }
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* CANVAS */
+  #hero-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  #hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    min-height: 100vh;
+  }
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+  .hero-name {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 12vw, 200px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+  .hero-name span { color: var(--accent); }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 24px;
+    font-weight: 300;
+    max-width: 400px;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    right: 48px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+  }
+
+  /* SOBRE MÍ */
+  #sobre {
+    padding: 160px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--accent);
+  }
+  .sobre-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 6vw, 96px);
+    line-height: 1;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .sobre-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #d0d0d0;
+    font-weight: 300;
+  }
+  .sobre-text strong { color: var(--text); font-weight: 500; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .stat-card {
+    background: #111111;
+    border: 1px solid #2c2c2c;
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .stat-card:hover { border-color: var(--accent); }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+  .stat-card:hover::after { transform: scaleX(1); }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 64px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* HABILIDADES */
+  #skills {
+    padding: 160px 48px;
+    background: #111111;
+    border-top: 1px solid #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
+  }
+  .skills-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 80px;
+  }
+  .skills-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 120px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 2px;
+  }
+  .skill-item {
+    border: 1px solid #2c2c2c;
+    padding: 28px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    transition: all 0.25s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--accent);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 0;
+  }
+  .skill-item:hover { color: #000; border-color: var(--accent); }
+  .skill-item:hover::before { transform: translateY(0); }
+  .skill-item span { position: relative; z-index: 1; }
+
+  /* PROYECTOS */
+  #proyectos { padding: 160px 48px; }
+  .proyectos-header { margin-bottom: 80px; }
+  .proyectos-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 120px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .project-list { display: flex; flex-direction: column; gap: 2px; }
+  .project-card {
+    border: 1px solid #2c2c2c;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 40px;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.3s;
+  }
+  .project-card:hover { background: #111111; border-color: var(--accent2); }
+  .project-card:hover::before { transform: scaleY(1); }
+  .project-num {
+    font-family: var(--font-display);
+    font-size: 48px;
+    color: #404040;
+    transition: color 0.3s;
+  }
+  .project-card:hover .project-num { color: var(--accent); }
+  .project-info h3 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .project-info p { font-size: 14px; color: #a0a0a0; }
+  .project-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid #2c2c2c;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .project-arrow {
+    font-size: 32px;
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .project-card:hover .project-arrow { color: var(--accent); transform: translate(4px, -4px); }
+
+  /* Badge de estado proyecto */
+  .project-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    margin-bottom: 10px;
+  }
+  .project-badge.live {
+    background: rgba(0, 255, 100, 0.1);
+    color: #00ff64;
+    border: 1px solid rgba(0, 255, 100, 0.25);
+  }
+  .project-badge.github {
+    background: rgba(255,255,255,0.06);
+    color: #909090;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .project-badge.wip {
+    background: rgba(255, 160, 0, 0.1);
+    color: #ffa000;
+    border: 1px solid rgba(255, 160, 0, 0.25);
+  }
+  .project-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .project-badge.live::before { animation: pulseDot 2s ease infinite; }
+  @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Links en proyectos */
+  .project-links { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .proj-link-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .proj-link-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .proj-link-btn.primary-link { border-color: var(--accent); color: var(--accent); }
+  .proj-link-btn.primary-link:hover { background: var(--accent); color: #000; }
+
+  /* CONTACTO */
+  #contacto {
+    padding: 160px 48px;
+    background: #111111;
+    border-top: 1px solid #2c2c2c;
+    text-align: center;
+  }
+  .contact-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .contact-title {
+    font-family: var(--font-display);
+    font-size: clamp(60px, 10vw, 160px);
+    line-height: 0.9;
+    text-transform: uppercase;
+    margin-bottom: 64px;
+  }
+  .contact-title span { color: var(--accent); }
+  .contact-links { display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; }
+  .contact-link {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 18px 32px;
+    border: 1px solid #2c2c2c;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.25s;
+  }
+  .contact-link:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+  .contact-link.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+  .contact-link.primary:hover { background: transparent; color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid #2c2c2c;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  footer p { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 2px; }
+
+  /* MARQUEE */
+  .marquee-section {
+    overflow: hidden;
+    border-top: 1px solid #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
+    padding: 20px 0;
+    background: var(--accent);
+    position: relative;
+    z-index: 2;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 48px;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  .marquee-item::before { content: '★ '; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.6; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE COMPLETO ── */
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    #sobre { gap: 48px; padding: 120px 40px; }
+    .project-card { padding: 36px; gap: 24px; }
+    #skills, #proyectos, #contacto { padding: 120px 40px; }
+  }
+
+  /* Móvil */
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+
+    /* NAV hamburguesa */
+    nav { padding: 16px 24px; background: rgba(5,5,5,0.99); }
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5,5,5,0.99);
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      z-index: 99;
+    }
+    .nav-links.open a { font-size: 18px; color: var(--accent); letter-spacing: 4px; }
+    .hamburger {
+      display: flex !important;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      z-index: 200;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 26px; height: 2px;
+      background: var(--accent);
+      transition: all 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* HERO */
+    #hero { padding: 0 24px 80px; }
+    .hero-name { font-size: clamp(56px, 17vw, 96px); line-height: 0.88; }
+    .hero-tag { font-size: 10px; letter-spacing: 2px; }
+    .hero-sub { font-size: 14px; max-width: 100%; margin-top: 16px; }
+    .hero-scroll { display: none; }
+    #hero-canvas { opacity: 0.5; }
+
+    /* MARQUEE */
+    .marquee-item { font-size: 18px; }
+
+    /* SOBRE */
+    #sobre { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
+    .sobre-title { font-size: clamp(40px, 13vw, 64px); }
+    .sobre-text { font-size: 15px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+    .stat-num { font-size: 48px; }
+    .stat-card { padding: 28px 20px; }
+    .section-label { font-size: 10px; }
+
+    /* SKILLS */
+    #skills { padding: 80px 24px; }
+    .skills-title { font-size: clamp(40px, 13vw, 72px); }
+    .skills-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .skill-item { padding: 18px 14px; font-size: 12px; }
+
+    /* PROYECTOS */
+    #proyectos { padding: 80px 24px; }
+    .proyectos-title { font-size: clamp(40px, 13vw, 72px); }
+    .project-card { grid-template-columns: 48px 1fr; gap: 16px; padding: 24px 20px; }
+    .project-num { font-size: 30px; }
+    .project-info h3 { font-size: 22px; }
+    .project-info p { font-size: 13px; }
+    .project-arrow { display: none; }
+
+    /* CONTACTO */
+    #contacto { padding: 80px 24px; }
+    .contact-title { font-size: clamp(44px, 14vw, 90px); }
+    .contact-links { flex-direction: column; align-items: stretch; gap: 2px; }
+    .contact-link { text-align: center; padding: 18px 24px; }
+
+    /* FOOTER */
+    footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
+  }
+
+  /* Móvil pequeño */
+  @media (max-width: 390px) {
+    .hero-name { font-size: 15vw; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+    .project-card { grid-template-columns: 1fr; }
+    .project-num { display: none; }
+  }
+  .hamburger { display: none; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <div class="nav-logo">DRM</div>
+  <div class="nav-links" id="nav-links">
+    <a href="#sobre" onclick="closeMenu()">Sobre mí</a>
+    <a href="#skills" onclick="closeMenu()">Skills</a>
+    <a href="#proyectos" onclick="closeMenu()">Proyectos</a>
+    <a href="#contacto" onclick="closeMenu()">Contacto</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<canvas id="hero-canvas"></canvas>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-tag">Fullstack Developer · España</div>
+  <h1 class="hero-name">Daniel<br><span>Rodríguez</span></h1>
+  <p class="hero-sub">Desarrollo aplicaciones web de principio a fin. Frontend que enamora, backend que funciona.</p>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">HTML & CSS</span>
+    <span class="marquee-item">JavaScript</span>
+    <span class="marquee-item">PHP</span>
+    <span class="marquee-item">Java</span>
+    <span class="marquee-item">SQL</span>
+    <span class="marquee-item">REST APIs</span>
+    <span class="marquee-item">Fullstack Dev</span>
+    <span class="marquee-item">HTML & CSS</span>
+    <span class="marquee-item">JavaScript</span>
+    <span class="marquee-item">PHP</span>
+    <span class="marquee-item">Java</span>
+    <span class="marquee-item">SQL</span>
+    <span class="marquee-item">REST APIs</span>
+    <span class="marquee-item">Fullstack Dev</span>
+  </div>
+</div>
+
+<!-- SOBRE MÍ -->
+<section id="sobre">
+  <div class="reveal">
+    <div class="section-label">Sobre mí</div>
+    <h2 class="sobre-title">Quién<br>soy</h2>
+    <p class="sobre-text">
+      Soy <strong>Daniel Rodríguez Machado</strong>, desarrollador web fullstack recién graduado en DAW. Me apasiona construir productos digitales que no solo funcionen bien, sino que también se vean increíbles.<br><br>
+      Trabajo tanto en <strong>frontend</strong> como en <strong>backend</strong>, y disfruto especialmente cuando los dos lados se conectan de forma limpia y eficiente.
+    </p>
+  </div>
+  <div class="stats-grid reveal">
+    <div class="stat-card">
+      <div class="stat-num">2+</div>
+      <div class="stat-label">Años formándome</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3+</div>
+      <div class="stat-label">Proyectos reales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">4+</div>
+      <div class="stat-label">Tecnologías</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Ganas de aprender</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-header reveal">
+    <div>
+      <div class="section-label">Stack técnico</div>
+      <h2 class="skills-title">Mis<br>Skills</h2>
+    </div>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="skill-item"><span>HTML5</span></div>
+    <div class="skill-item"><span>CSS3</span></div>
+    <div class="skill-item"><span>JavaScript</span></div>
+    <div class="skill-item"><span>PHP</span></div>
+    <div class="skill-item"><span>Java</span></div>
+    <div class="skill-item"><span>MySQL</span></div>
+    <div class="skill-item"><span>REST API</span></div>
+    <div class="skill-item"><span>Git / GitHub</span></div>
+    <div class="skill-item"><span>Responsive Design</span></div>
+    <div class="skill-item"><span>MVC Pattern</span></div>
+  </div>
+</section>
+
+<!-- PROYECTOS -->
+<section id="proyectos">
+  <div class="proyectos-header reveal">
+    <div class="section-label">Trabajo</div>
+    <h2 class="proyectos-title">Mis<br>Proyectos</h2>
+  </div>
+  <div class="project-list reveal">
+
+    <!-- PROYECTO 1: ConstruccionesChamusinos - LIVE -->
+    <div class="project-card">
+      <div class="project-num">01</div>
+      <div class="project-info">
+        <div class="project-badge live">En producción</div>
+        <h3>Construcciones Chamusinos</h3>
+        <p>Web corporativa desarrollada para empresa real de construcción. Diseño, maquetación y experiencia de usuario desde cero con enfoque en conversión y presencia profesional online.</p>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Responsive</span>
+        </div>
+        <div class="project-links">
+          <a href="https://danniigz.github.io/ConstruccionesChamusinos/" target="_blank" class="proj-link-btn primary-link">Ver web ↗</a>
+          <a href="https://github.com/danniigz/ConstruccionesChamusinos" target="_blank" class="proj-link-btn">GitHub</a>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </div>
+
+    <!-- PROYECTO 2: CineVerse - GitHub -->
+    <div class="project-card">
+      <div class="project-num">02</div>
+      <div class="project-info">
+        <div class="project-badge github">GitHub</div>
+        <h3>CineVerse</h3>
+        <p>Aplicación web de catálogo de películas estilo streaming. Interfaz dinámica con búsqueda, filtros y fichas de contenido detalladas.</p>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Frontend</span>
+        </div>
+        <div class="project-links">
+          <a href="https://danniigz.github.io/CineVerse1/" target="_blank" class="proj-link-btn primary-link">Ver demo ↗</a>
+          <a href="https://github.com/danniigz/CineVerse1" target="_blank" class="proj-link-btn">GitHub</a>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </div>
+
+    <!-- PROYECTO 3: Calculadora - WIP -->
+    <div class="project-card">
+      <div class="project-num">03</div>
+      <div class="project-info">
+        <div class="project-badge live">Online ↗</div>
+        <h3>Calculadora</h3>
+        <p>Calculadora web desarrollada con JavaScript puro. Operaciones básicas y avanzadas con interfaz limpia y responsive.</p>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+        </div>
+        <div class="project-links">
+          <a href="https://danniigz.github.io/Calculadora/" target="_blank" class="proj-link-btn primary-link">Ver demo ↗</a>
+          <a href="https://github.com/danniigz/Calculadora" target="_blank" class="proj-link-btn">GitHub</a>
+        </div>
+      </div>
+      <div class="project-arrow">↗</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="contact-label">¿Hablamos?</div>
+  <h2 class="contact-title reveal">Let's<br><span>Work</span><br>Together</h2>
+  <div class="contact-links reveal">
+    <a href="mailto:drodriguez.daw@gmail.com" class="contact-link primary">Email</a>
+    <a href="https://www.linkedin.com/in/daniel-rodriguez-machado-410313346/" target="_blank" class="contact-link">LinkedIn</a>
+    <a href="https://github.com/danniigz" target="_blank" class="contact-link">GitHub</a>
+    <a href="cv_daniel_rodriguez.pdf" download class="contact-link">CV PDF</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Daniel Rodríguez Machado</p>
+  <p>Diseñado & Desarrollado con 🖤</p>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── MENÚ HAMBURGUESA ────────────────────────────────────
+const hamburger = document.getElementById('hamburger');
+const navLinks  = document.getElementById('nav-links');
+
+function closeMenu() {
+  hamburger.classList.remove('open');
+  navLinks.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+  document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
+});
+
+// ── CURSOR ──────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+(function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+document.querySelectorAll('a, button, .project-card, .skill-item').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '24px'; cursor.style.height = '24px';
+    ring.style.width = '60px'; ring.style.height = '60px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '12px'; cursor.style.height = '12px';
+    ring.style.width = '40px'; ring.style.height = '40px';
+  });
+});
+
+// ── THREE.JS: TORUS KNOT ────────────────────────────────
+const isMobile = window.innerWidth < 768;
+const canvas = document.getElementById('hero-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 5;
+
+// Geometría: torus knot (menos segmentos en móvil para mejor rendimiento)
+const geo = isMobile
+  ? new THREE.TorusKnotGeometry(1.0, 0.3, 80, 12, 2, 3)
+  : new THREE.TorusKnotGeometry(1.2, 0.35, 200, 24, 2, 3);
+const mat = new THREE.MeshStandardMaterial({
+  color: 0xe8ff00,
+  metalness: 0.8,
+  roughness: 0.1,
+});
+const mesh = new THREE.Mesh(geo, mat);
+scene.add(mesh);
+
+// Wireframe overlay
+const wireMat = new THREE.MeshBasicMaterial({
+  color: 0xe8ff00,
+  wireframe: true,
+  transparent: true,
+  opacity: 0.08,
+});
+const wireMesh = new THREE.Mesh(geo, wireMat);
+scene.add(wireMesh);
+
+// Lights
+const amb = new THREE.AmbientLight(0xffffff, 0.2);
+scene.add(amb);
+const point1 = new THREE.PointLight(0xe8ff00, 3, 20);
+point1.position.set(3, 3, 3);
+scene.add(point1);
+const point2 = new THREE.PointLight(0xff4d00, 2, 20);
+point2.position.set(-3, -2, 2);
+scene.add(point2);
+const dLight = new THREE.DirectionalLight(0xffffff, 0.5);
+dLight.position.set(0, 5, 5);
+scene.add(dLight);
+
+// Particle field
+const partGeo = new THREE.BufferGeometry();
+const partCount = isMobile ? 150 : 500;
+const positions = new Float32Array(partCount * 3);
+for (let i = 0; i < partCount * 3; i++) positions[i] = (Math.random() - 0.5) * 30;
+partGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const partMat = new THREE.PointsMaterial({ color: 0xe8ff00, size: 0.04, transparent: true, opacity: 0.3 });
+const particles = new THREE.Points(partGeo, partMat);
+scene.add(particles);
+
+// Scroll
+let scrollY = 0, targetScrollY = 0;
+const totalSections = 5;
+window.addEventListener('scroll', () => { targetScrollY = window.scrollY; });
+
+// Mouse parallax (desktop) + touch parallax (móvil)
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', e => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+// Touch parallax para móvil
+document.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  mouseX = (t.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (t.clientY / window.innerHeight - 0.5) * 2;
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  const time = performance.now() * 0.001;
+
+  scrollY += (targetScrollY - scrollY) * 0.05;
+  const docH = document.body.scrollHeight - window.innerHeight;
+  const progress = Math.min(scrollY / docH, 1);
+
+  // Posición: se mueve por la pantalla con el scroll
+  mesh.position.x = wireMesh.position.x = -Math.sin(progress * Math.PI * 2) * 2.5;
+  mesh.position.y = wireMesh.position.y = Math.cos(progress * Math.PI * 2.5) * 1.5;
+
+  // Rotación driven by scroll + tiempo
+  mesh.rotation.x = wireMesh.rotation.x = progress * Math.PI * 6 + time * 0.3;
+  mesh.rotation.y = wireMesh.rotation.y = progress * Math.PI * 4 + time * 0.2;
+  mesh.rotation.z = wireMesh.rotation.z = Math.sin(progress * Math.PI * 3) * Math.PI;
+
+  // Escala con pulso suave
+  const scale = 1 + Math.sin(time * 1.5) * 0.05;
+  mesh.scale.setScalar(scale);
+  wireMesh.scale.setScalar(scale);
+
+  // Color cambia con el scroll
+  const h = progress * 0.15;
+  mat.color.setHSL(h, 1, 0.55);
+  point1.color.setHSL(h, 1, 0.55);
+
+  // Parallax con ratón
+  camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+  camera.position.y += (-mouseY * 0.3 - camera.position.y) * 0.05;
+  camera.lookAt(scene.position);
+
+  // Partículas rotan lentamente
+  particles.rotation.y = time * 0.05;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── SCROLL REVEAL ────────────────────────────────────────
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+revealEls.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
