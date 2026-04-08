@@ -165,9 +165,117 @@
   #sobre {
     padding: 160px 48px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    grid-template-columns: 260px 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .sobre-photo-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 8px;
+  }
+  .sobre-photo-wrapper {
+    position: relative;
+    width: 220px;
+    height: 280px;
+  }
+  .sobre-photo-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, var(--accent), transparent 60%);
+    z-index: 0;
+  }
+  .sobre-photo-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 60px;
+    height: 60px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    z-index: 2;
+  }
+  .sobre-photo {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: grayscale(15%);
+  }
+  .sobre-certs {
+    margin-top: 40px;
+    width: 220px;
+  }
+  .cert-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
     align-items: center;
+    gap: 8px;
+  }
+  .cert-label::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .cert-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e1e1e;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .cert-item:last-child { border-bottom: none; }
+  .cert-item:hover .cert-name { color: var(--accent); }
+  .cert-item:hover .cert-arrow { color: var(--accent); transform: translate(2px, -2px); }
+  .cert-icon {
+    width: 26px;
+    height: 26px;
+    border: 1px solid #2c2c2c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    background: #111;
+  }
+  .cert-text { flex: 1; min-width: 0; }
+  .cert-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+  .cert-issuer {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .cert-arrow {
+    font-size: 13px;
+    color: #404040;
+    flex-shrink: 0;
+    transition: all 0.2s;
   }
   .section-label {
     font-family: var(--font-mono);
@@ -298,114 +406,288 @@
     line-height: 1;
     text-transform: uppercase;
   }
-  .project-list { display: flex; flex-direction: column; gap: 2px; }
-  .project-card {
-    border: 1px solid #2c2c2c;
-    padding: 48px;
+
+  /* Grid: 1 grande arriba + 3 abajo */
+  .project-grid {
     display: grid;
-    grid-template-columns: 80px 1fr auto;
-    align-items: center;
-    gap: 40px;
-    transition: all 0.3s;
-    cursor: pointer;
+    gap: 3px;
+  }
+  .project-grid-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    margin-bottom: 3px;
+  }
+  .project-grid-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+  }
+
+  .project-card {
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    aspect-ratio: 16/10;
+    display: block;
+    text-decoration: none;
+    isolation: isolate;
+    transform: translateZ(0);
+    min-height: 0;
+    contain: layout paint;
   }
-  .project-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0;
-    width: 3px; height: 100%;
-    background: var(--accent);
-    transform: scaleY(0);
-    transition: transform 0.3s;
+  .project-card-featured {
+    aspect-ratio: 21/9;
   }
-  .project-card:hover { background: #111111; border-color: var(--accent2); }
-  .project-card:hover::before { transform: scaleY(1); }
-  .project-num {
-    font-family: var(--font-display);
-    font-size: 48px;
-    color: #404040;
-    transition: color 0.3s;
-  }
-  .project-card:hover .project-num { color: var(--accent); }
-  .project-info h3 {
-    font-family: var(--font-display);
-    font-size: 36px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .project-info p { font-size: 14px; color: #a0a0a0; }
-  .project-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .tag {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    padding: 4px 10px;
-    border: 1px solid #2c2c2c;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .project-arrow {
-    font-size: 32px;
-    color: var(--muted);
-    transition: all 0.3s;
-  }
-  .project-card:hover .project-arrow { color: var(--accent); transform: translate(4px, -4px); }
 
-  /* Badge de estado proyecto */
+  /* Screenshot de fondo */
+  .project-screenshot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.6s ease, filter 0.4s ease;
+    filter: grayscale(20%) brightness(0.75) saturate(0.9);
+    z-index: 0;
+  }
+  .project-card:hover .project-screenshot {
+    transform: scale(1.04);
+    filter: grayscale(0%) brightness(0.55) saturate(1.1);
+  }
+
+  /* Overlay gradiente — más ligero para que se vea el screenshot */
+  .project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,0.88) 0%,
+      rgba(0,0,0,0.35) 45%,
+      rgba(0,0,0,0.05) 100%
+    );
+    transition: background 0.4s;
+    z-index: 1;
+  }
+  .project-card:hover .project-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,0.95) 0%,
+      rgba(0,0,0,0.6) 55%,
+      rgba(0,0,0,0.15) 100%
+    );
+  }
+
+  /* Número decorativo */
+  .project-num {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-family: var(--font-display);
+    font-size: 80px;
+    color: rgba(255,255,255,0.06);
+    line-height: 1;
+    z-index: 2;
+    transition: color 0.3s;
+    pointer-events: none;
+  }
+  .project-card:hover .project-num { color: rgba(212,245,0,0.12); }
+
+  /* Contenido inferior */
+  .project-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    padding: 28px 32px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    clip: rect(auto, auto, auto, auto);
+  }
+
+  /* Badge */
   .project-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 4px 10px;
+    padding: 3px 10px;
     border-radius: 100px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .project-badge.live {
-    background: rgba(0, 255, 100, 0.1);
+    background: rgba(0, 255, 100, 0.12);
     color: #00ff64;
-    border: 1px solid rgba(0, 255, 100, 0.25);
+    border: 1px solid rgba(0, 255, 100, 0.3);
   }
-  .project-badge.github {
-    background: rgba(255,255,255,0.06);
+  .project-badge.demo {
+    background: rgba(255,255,255,0.07);
     color: #909090;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .project-badge.wip {
-    background: rgba(255, 160, 0, 0.1);
-    color: #ffa000;
-    border: 1px solid rgba(255, 160, 0, 0.25);
+    border: 1px solid rgba(255,255,255,0.12);
   }
   .project-badge::before {
     content: '';
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: currentColor;
   }
   .project-badge.live::before { animation: pulseDot 2s ease infinite; }
   @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* Links en proyectos */
-  .project-links { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-  .proj-link-btn {
+  .project-name {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.5vw, 34px);
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+    transition: color 0.3s;
+  }
+  .project-card:hover .project-name { color: var(--accent); }
+
+  .project-desc {
+    font-size: 13px;
+    color: #909090;
+    font-weight: 300;
+    max-width: 480px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .project-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tag {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 9px;
+    padding: 3px 8px;
+    border: 1px solid #2c2c2c;
+    color: #606060;
     letter-spacing: 1px;
     text-transform: uppercase;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    color: var(--muted);
+  }
+
+  .project-links {
+    display: flex;
+    gap: 8px;
+    transform: translateY(4px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.7;
+  }
+  .project-card:hover .project-links {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .proj-link-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border: 1px solid #3c3c3c;
+    color: #b0b0b0;
     text-decoration: none;
     transition: all 0.2s;
   }
   .proj-link-btn:hover { border-color: var(--accent); color: var(--accent); }
   .proj-link-btn.primary-link { border-color: var(--accent); color: var(--accent); }
   .proj-link-btn.primary-link:hover { background: var(--accent); color: #000; }
+
+  /* PROYECTOS — LISTA EDITORIAL */
+  .plist { display: flex; flex-direction: column; gap: 40px; }
+
+  .pitem {
+    display: grid;
+grid-template-columns: 3fr 2fr;
+min-height: 0;
+    border-top: 1px solid #2c2c2c;
+  }
+  .pitem:last-child { border-bottom: 1px solid #2c2c2c; }
+
+  .pitem-img-wrap { overflow: hidden; order: 0; display: flex; }
+  .pitem-info {
+    order: 1;
+  padding: 36px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 1px solid #2c2c2c;
+    background: #080808;
+  }
+  .pitem-rev .pitem-img-wrap { order: 1; border-left: 1px solid #2c2c2c; }
+  .pitem-rev .pitem-info { order: 0; border-left: none; }
+
+  .pitem-rev {
+  grid-template-columns: 2fr 3fr;
+}
+
+  .pitem-img {
+    width: 100%;
+height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    filter: grayscale(15%) brightness(0.85);
+    transition: transform 0.6s ease, filter 0.4s ease;
+  }
+  .pitem:hover .pitem-img { transform: scale(1.03); filter: grayscale(0%) brightness(1); }
+
+  .pitem-top { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .pitem-num {
+    font-family: var(--font-display);
+    font-size: 72px;
+    line-height: 1;
+    color: rgba(255,255,255,0.06);
+    letter-spacing: -2px;
+    user-select: none;
+  }
+  .pbadge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+  .pbadge.live { color: #00ff64; background: rgba(0,255,100,0.1); border: 1px solid rgba(0,255,100,0.25); }
+  .pbadge.demo { color: #909090; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+
+  .pitem-name {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 3.5vw, 54px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 20px;
+    transition: color 0.3s;
+  }
+  .pitem:hover .pitem-name { color: var(--accent); }
+
+  .pitem-desc { font-size: 14px; color: #808080; line-height: 1.7; font-weight: 300; margin-bottom: 24px; max-width: 380px; }
+
+  .ptags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
+  .ptag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border: 1px solid #2c2c2c; color: #555; }
+
+  .pbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pbtn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 9px 20px; border: 1px solid #333; color: #888; text-decoration: none; transition: all 0.2s; }
+  .pbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .pbtn.primary { border-color: var(--accent); color: var(--accent); }
+  .pbtn.primary:hover { background: var(--accent); color: #000; }
+
+  @media (max-width: 900px) {
+    .pitem, .pitem-rev { grid-template-columns: 1fr; min-height: auto; }
+    .pitem-img-wrap, .pitem-rev .pitem-img-wrap { order: 0; border-left: none; height: 240px; }
+    .pitem-info, .pitem-rev .pitem-info { order: 1; border-left: none; border-top: 1px solid #2c2c2c; padding: 36px 24px; }
+    .pitem-num { font-size: 48px; }
+  }
 
   /* CONTACTO */
   #contacto {
@@ -510,9 +792,12 @@
 
   /* Tablet */
   @media (max-width: 1024px) {
-    #sobre { gap: 48px; padding: 120px 40px; }
-    .project-card { padding: 36px; gap: 24px; }
+    #sobre { grid-template-columns: 1fr 1fr; gap: 48px; padding: 120px 40px; }
+    .sobre-photo-col { display: none; }
     #skills, #proyectos, #contacto { padding: 120px 40px; }
+    .project-grid-top { grid-template-columns: 1fr; }
+    .project-grid-bottom { grid-template-columns: 1fr 1fr; }
+    .project-card-featured { aspect-ratio: 16/9; }
   }
 
   /* Móvil */
@@ -568,6 +853,7 @@
 
     /* SOBRE */
     #sobre { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
+    .sobre-photo-col { display: none; }
     .sobre-title { font-size: clamp(40px, 13vw, 64px); }
     .sobre-text { font-size: 15px; }
     .stats-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
@@ -584,11 +870,13 @@
     /* PROYECTOS */
     #proyectos { padding: 80px 24px; }
     .proyectos-title { font-size: clamp(40px, 13vw, 72px); }
-    .project-card { grid-template-columns: 48px 1fr; gap: 16px; padding: 24px 20px; }
-    .project-num { font-size: 30px; }
-    .project-info h3 { font-size: 22px; }
-    .project-info p { font-size: 13px; }
-    .project-arrow { display: none; }
+    .project-grid-top { grid-template-columns: 1fr; }
+    .project-grid-bottom { grid-template-columns: 1fr; }
+    .project-card { aspect-ratio: 4/3; }
+    .project-card-featured { aspect-ratio: 4/3; }
+    .project-num { font-size: 48px; top: 12px; right: 16px; }
+    .project-content { padding: 20px; }
+    .project-name { font-size: 22px; }
 
     /* CONTACTO */
     #contacto { padding: 80px 24px; }
@@ -605,8 +893,6 @@
     .hero-name { font-size: 15vw; }
     .stats-grid { grid-template-columns: 1fr; }
     .skills-grid { grid-template-columns: 1fr 1fr; }
-    .project-card { grid-template-columns: 1fr; }
-    .project-num { display: none; }
   }
   .hamburger { display: none; }
 </style>
@@ -661,6 +947,30 @@
 
 <!-- SOBRE MÍ -->
 <section id="sobre">
+  <div class="sobre-photo-col reveal">
+    <div class="sobre-photo-wrapper">
+      <img src="imagenes/dani.png" alt="Daniel Rodríguez Machado" class="sobre-photo">
+    </div>
+    <div class="sobre-certs">
+      <div class="cert-label">Certificaciones</div>
+      <a href="https://coursera.org/verify/specialization/MFX50C4RXKHK" target="_blank" class="cert-item">
+        <div class="cert-icon">G</div>
+        <div class="cert-text">
+          <span class="cert-name">Google AI Essentials</span>
+          <span class="cert-issuer">Google · Coursera · 2026</span>
+        </div>
+        <span class="cert-arrow">↗</span>
+      </a>
+      <a href="cert_mouredev.pdf" target="_blank" class="cert-item">
+        <div class="cert-icon">{m}</div>
+        <div class="cert-text">
+          <span class="cert-name">Desarrollo con IA</span>
+          <span class="cert-issuer">MoureDev · BIG School · 2026</span>
+        </div>
+        <span class="cert-arrow">↗</span>
+      </a>
+    </div>
+  </div>
   <div class="reveal">
     <div class="section-label">Sobre mí</div>
     <h2 class="sobre-title">Quién<br>soy</h2>
@@ -675,7 +985,7 @@
       <div class="stat-label">Años formándome</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num">3+</div>
+      <div class="stat-num">4+</div>
       <div class="stat-label">Proyectos reales</div>
     </div>
     <div class="stat-card">
@@ -717,68 +1027,104 @@
     <div class="section-label">Trabajo</div>
     <h2 class="proyectos-title">Mis<br>Proyectos</h2>
   </div>
-  <div class="project-list reveal">
 
-    <!-- PROYECTO 1: ConstruccionesChamusinos - LIVE -->
-    <div class="project-card">
-      <div class="project-num">01</div>
-      <div class="project-info">
-        <div class="project-badge live">En producción</div>
-        <h3>Construcciones Chamusinos</h3>
-        <p>Web corporativa desarrollada para empresa real de construcción. Diseño, maquetación y experiencia de usuario desde cero con enfoque en conversión y presencia profesional online.</p>
-        <div class="project-tags">
-          <span class="tag">HTML</span>
-          <span class="tag">CSS</span>
-          <span class="tag">JavaScript</span>
-          <span class="tag">Responsive</span>
+  <div class="plist">
+
+    <!-- 01 -->
+    <div class="pitem reveal">
+      <div class="pitem-img-wrap">
+        <img src="imagenes/capConstCham.png" alt="Construcciones Chamusinos" class="pitem-img" loading="lazy">
+      </div>
+      <div class="pitem-info">
+        <div class="pitem-top">
+          <span class="pitem-num">01</span>
+          <span class="pbadge live">● En producción</span>
         </div>
-        <div class="project-links">
-          <a href="https://danniigz.github.io/ConstruccionesChamusinos/" target="_blank" class="proj-link-btn primary-link">Ver web ↗</a>
-          <a href="https://github.com/danniigz/ConstruccionesChamusinos" target="_blank" class="proj-link-btn">GitHub</a>
+        <h3 class="pitem-name">Construcciones<br>Chamusinos</h3>
+        <p class="pitem-desc">Web corporativa para empresa real de construcción. Diseño, maquetación y UX desde cero con enfoque en conversión y presencia profesional.</p>
+        <div class="ptags">
+          <span class="ptag">HTML</span>
+          <span class="ptag">CSS</span>
+          <span class="ptag">JavaScript</span>
+          <span class="ptag">Responsive</span>
+        </div>
+        <div class="pbtns">
+          <a href="https://construccioneschamusinos.es" target="_blank" class="pbtn primary">Ver web ↗</a>
+          <a href="https://github.com/danniigz/ConstruccionesChamusinos" target="_blank" class="pbtn">GitHub</a>
         </div>
       </div>
-      <div class="project-arrow">↗</div>
     </div>
 
-    <!-- PROYECTO 2: CineVerse - GitHub -->
-    <div class="project-card">
-      <div class="project-num">02</div>
-      <div class="project-info">
-        <div class="project-badge github">GitHub</div>
-        <h3>CineVerse</h3>
-        <p>Aplicación web de catálogo de películas estilo streaming. Interfaz dinámica con búsqueda, filtros y fichas de contenido detalladas.</p>
-        <div class="project-tags">
-          <span class="tag">HTML</span>
-          <span class="tag">CSS</span>
-          <span class="tag">JavaScript</span>
-          <span class="tag">Frontend</span>
+    <!-- 02 -->
+    <div class="pitem pitem-rev reveal">
+      <div class="pitem-img-wrap">
+        <img src="imagenes/capCalcuFacil.png" alt="CalcuFácil" class="pitem-img" loading="lazy">
+      </div>
+      <div class="pitem-info">
+        <div class="pitem-top">
+          <span class="pitem-num">02</span>
+          <span class="pbadge live">● En producción</span>
         </div>
-        <div class="project-links">
-          <a href="https://danniigz.github.io/CineVerse1/" target="_blank" class="proj-link-btn primary-link">Ver demo ↗</a>
-          <a href="https://github.com/danniigz/CineVerse1" target="_blank" class="proj-link-btn">GitHub</a>
+        <h3 class="pitem-name">CalcuFácil</h3>
+        <p class="pitem-desc">Plataforma de calculadoras financieras en español. SEO optimizado, dominio propio y monetización con AdSense.</p>
+        <div class="ptags">
+          <span class="ptag">HTML</span>
+          <span class="ptag">CSS</span>
+          <span class="ptag">JavaScript</span>
+          <span class="ptag">SEO</span>
+        </div>
+        <div class="pbtns">
+          <a href="https://calcufacil.es" target="_blank" class="pbtn primary">Ver web ↗</a>
+          <a href="https://github.com/danniigz/calcufacil" target="_blank" class="pbtn">GitHub</a>
         </div>
       </div>
-      <div class="project-arrow">↗</div>
     </div>
 
-    <!-- PROYECTO 3: Calculadora - WIP -->
-    <div class="project-card">
-      <div class="project-num">03</div>
-      <div class="project-info">
-        <div class="project-badge live">Online ↗</div>
-        <h3>Calculadora</h3>
-        <p>Calculadora web desarrollada con JavaScript puro. Operaciones básicas y avanzadas con interfaz limpia y responsive.</p>
-        <div class="project-tags">
-          <span class="tag">HTML</span>
-          <span class="tag">CSS</span>
-          <span class="tag">JavaScript</span>
+    <!-- 03 -->
+    <div class="pitem reveal">
+      <div class="pitem-img-wrap">
+        <img src="imagenes/capCineVerse.png" alt="CineVerse" class="pitem-img" loading="lazy">
+      </div>
+      <div class="pitem-info">
+        <div class="pitem-top">
+          <span class="pitem-num">03</span>
+          <span class="pbadge demo">● Demo</span>
         </div>
-        <div class="project-links">
-          <a href="https://danniigz.github.io/Calculadora/" target="_blank" class="proj-link-btn primary-link">Ver demo ↗</a>
-          <a href="https://github.com/danniigz/Calculadora" target="_blank" class="proj-link-btn">GitHub</a>
+        <h3 class="pitem-name">CineVerse</h3>
+        <p class="pitem-desc">App de catálogo de películas estilo streaming. Búsqueda, filtros y fichas de contenido detalladas.</p>
+        <div class="ptags">
+          <span class="ptag">HTML</span>
+          <span class="ptag">CSS</span>
+          <span class="ptag">JavaScript</span>
+        </div>
+        <div class="pbtns">
+          <a href="https://danniigz.github.io/CineVerse1/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+          <a href="https://github.com/danniigz/CineVerse1" target="_blank" class="pbtn">GitHub</a>
         </div>
       </div>
-      <div class="project-arrow">↗</div>
+    </div>
+
+    <!-- 04 -->
+    <div class="pitem pitem-rev reveal">
+      <div class="pitem-img-wrap">
+        <img src="imagenes/capZonaCero.png" alt="Zona Cero Barbershop" class="pitem-img" loading="lazy">
+      </div>
+      <div class="pitem-info">
+        <div class="pitem-top">
+          <span class="pitem-num">04</span>
+          <span class="pbadge demo">● Demo</span>
+        </div>
+        <h3 class="pitem-name">Zona Cero<br>Barbershop</h3>
+        <p class="pitem-desc">Demo para barbería local. Estética cinematográfica en blanco y negro con animaciones hero y diseño mobile-first.</p>
+        <div class="ptags">
+          <span class="ptag">HTML</span>
+          <span class="ptag">CSS</span>
+          <span class="ptag">JavaScript</span>
+        </div>
+        <div class="pbtns">
+          <a href="https://zonacerodemo.netlify.app/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -797,7 +1143,7 @@
 </section>
 
 <footer>
-  <p>© 2025 Daniel Rodríguez Machado</p>
+  <p>© 2026 Daniel Rodríguez Machado</p>
   <p>Diseñado & Desarrollado con 🖤</p>
 </footer>
 
