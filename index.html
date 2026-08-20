@@ -7,6 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* SCROLLBAR A MEDIDA */
+  html { scrollbar-color: #2c2c2c #050505; scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #050505; }
+  ::-webkit-scrollbar-thumb { background: #2c2c2c; border: 2px solid #050505; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* BARRA DE PROGRESO DE SCROLL */
+  .scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 10000;
+    box-shadow: 0 0 12px rgba(212,245,0,0.6);
+  }
   /* <picture> necesita ser block-level con tamaño definido para que el width:100%/height:100%
      del <img> dentro se resuelva igual que cuando el <img> era hijo directo del contenedor */
   picture { display: block; width: 100%; height: 100%; }
@@ -483,6 +503,12 @@
     background: var(--accent);
   }
 
+  /* GITHUB ACTIVITY */
+  .github-strip { padding: 100px 48px; text-align: center; background: var(--bg); }
+  .github-strip .section-label { justify-content: center; }
+  .github-stats-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-top: 32px; }
+  .github-stats-row img { max-width: 380px; width: 100%; height: auto; }
+
   /* PROYECTOS */
   #proyectos { padding: 160px 48px; }
   .proyectos-header { margin-bottom: 80px; }
@@ -495,6 +521,7 @@
 
   /* PROYECTOS — LISTA EDITORIAL */
   .pitem {
+    position: relative;
     display: grid;
 grid-template-columns: 3fr 2fr;
 min-height: 0;
@@ -503,6 +530,20 @@ min-height: 0;
   }
   .pitem:last-child { border-bottom: 1px solid #2c2c2c; }
   .pitem:hover { border-color: #3c3c3c; }
+
+  /* Spotlight que sigue al cursor (--x/--y los actualiza el JS por tarjeta) */
+  .pitem::before, .stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(280px circle at var(--x, 50%) var(--y, 50%), rgba(212,245,0,0.07), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .pitem:hover::before, .stat-card:hover::before { opacity: 1; }
+  .pitem-featured::before { background: radial-gradient(280px circle at var(--x, 50%) var(--y, 50%), rgba(255,77,0,0.09), transparent 65%); }
 
   .pitem-img-wrap { overflow: hidden; order: 0; display: flex; }
   .pitem-info {
@@ -612,6 +653,21 @@ height: 100%;
     margin-bottom: 4px;
   }
   .pcase-text { font-size: 14px; color: #a8a8a8; line-height: 1.6; font-weight: 300; }
+
+  /* Mini diagrama de arquitectura (pipeline del sistema multiagente) */
+  .pflow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .pflow-step {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,77,0,0.3);
+    color: var(--accent2);
+    background: rgba(255,77,0,0.05);
+    white-space: nowrap;
+  }
+  .pflow-arrow { color: #555; font-size: 13px; }
 
   /* Subgrupo (ej. "Proyectos freelance") — mismo lenguaje visual que .skills-group-label */
   .pgroup-label {
@@ -745,6 +801,58 @@ height: 100%;
   }
   .marquee-item::before { content: '★ '; }
 
+  /* TERMINAL */
+  .terminal-wrap {
+    padding: 90px 48px;
+    display: flex;
+    justify-content: center;
+    background: var(--bg);
+  }
+  .terminal {
+    width: 100%;
+    max-width: 640px;
+    border: 1px solid #2c2c2c;
+    background: #0a0a0a;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,0.7);
+  }
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #2c2c2c;
+    background: #111111;
+  }
+  .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .terminal-dot.red { background: #ff5f56; }
+  .terminal-dot.yellow { background: #ffbd2e; }
+  .terminal-dot.green { background: #27c93f; }
+  .terminal-title {
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+  .terminal-body {
+    padding: 28px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 2;
+  }
+  .terminal-line { color: var(--text); }
+  .terminal-prompt { color: var(--accent); margin-right: 8px; }
+  .terminal-out {
+    color: var(--muted);
+    padding-left: 20px;
+    margin-bottom: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .terminal-out.ok { color: #00ff64; }
+  .terminal-cursor { display: inline-block; color: var(--accent); animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
   /* ANIMATIONS */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(40px); }
@@ -873,6 +981,8 @@ height: 100%;
 </head>
 <body>
 
+<div class="scroll-progress" id="scroll-progress"></div>
+
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 
@@ -944,6 +1054,27 @@ height: 100%;
     <span class="marquee-item">SQL</span>
     <span class="marquee-item">REST APIs</span>
     <span class="marquee-item">Fullstack Dev</span>
+  </div>
+</div>
+
+<!-- TERMINAL -->
+<div class="terminal-wrap">
+  <div class="terminal reveal" id="terminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">daniel@portfolio — zsh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd" data-text="whoami"></span></div>
+      <div class="terminal-out">daniel_rodriguez_machado — fullstack + ia</div>
+      <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd" data-text="cat stack.json"></span></div>
+      <div class="terminal-out">{ core: [js, php, java, laravel], ia: [langchain, rag, multi-agent] }</div>
+      <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd" data-text="./tfm.sh --check airecruit"></span></div>
+      <div class="terminal-out ok">✓ TFM aprobado con valoración positiva</div>
+      <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cursor">_</span></div>
+    </div>
   </div>
 </div>
 
@@ -1054,6 +1185,15 @@ height: 100%;
   </div>
 </section>
 
+<!-- GITHUB ACTIVITY -->
+<div class="github-strip">
+  <div class="section-label">Actividad en GitHub</div>
+  <div class="github-stats-row">
+    <img src="https://github-readme-stats.vercel.app/api?username=danniigz&show_icons=true&hide_border=true&bg_color=0a0a0a&title_color=d4f500&text_color=f8f8f8&icon_color=d4f500" alt="Estadísticas de GitHub de danniigz" loading="lazy">
+    <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=danniigz&hide_border=true&bg_color=0a0a0a&title_color=d4f500&text_color=f8f8f8&layout=compact" alt="Lenguajes más usados por danniigz en GitHub" loading="lazy">
+  </div>
+</div>
+
 <!-- PROYECTOS -->
 <section id="proyectos">
   <div class="proyectos-header reveal">
@@ -1089,6 +1229,15 @@ height: 100%;
             <span class="pcase-label">Resultado</span>
             <p class="pcase-text">Desarrollado como Trabajo Final del Máster en Desarrollo de Software con IA (BIG School), aprobado con valoración positiva.</p>
           </div>
+        </div>
+        <div class="pflow">
+          <span class="pflow-step">CV + Oferta</span>
+          <span class="pflow-arrow">→</span>
+          <span class="pflow-step">Agente RAG</span>
+          <span class="pflow-arrow">→</span>
+          <span class="pflow-step">Agente Matching</span>
+          <span class="pflow-arrow">→</span>
+          <span class="pflow-step">Informe + Score</span>
         </div>
         <div class="ptags">
           <span class="ptag">LangChain</span>
@@ -1288,6 +1437,50 @@ document.querySelectorAll('a, button, .project-card, .skill-item').forEach(el =>
   });
 });
 
+// ── SPOTLIGHT EN TARJETAS ─────────────────────────────────
+document.querySelectorAll('.pitem, .stat-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--x', ((e.clientX - rect.left) / rect.width) * 100 + '%');
+    card.style.setProperty('--y', ((e.clientY - rect.top) / rect.height) * 100 + '%');
+  });
+});
+
+// ── INCLINACIÓN 3D EN LA TARJETA DESTACADA (AIRECRUIT) ────
+const featuredCard = document.querySelector('.pitem-featured');
+if (featuredCard && !isMobileDevice()) {
+  featuredCard.style.transition = 'transform 0.35s ease, border-color 0.3s, box-shadow 0.3s';
+  featuredCard.addEventListener('mousemove', e => {
+    const rect = featuredCard.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    featuredCard.style.transform = `perspective(1400px) rotateX(${(py * -3).toFixed(2)}deg) rotateY(${(px * 3).toFixed(2)}deg)`;
+  });
+  featuredCard.addEventListener('mouseleave', () => {
+    featuredCard.style.transform = 'perspective(1400px) rotateX(0deg) rotateY(0deg)';
+  });
+}
+function isMobileDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
+// ── BARRA DE PROGRESO DE SCROLL ──────────────────────────
+const scrollProgressEl = document.getElementById('scroll-progress');
+let progressTicking = false;
+function updateScrollProgress() {
+  const docH = document.body.scrollHeight - window.innerHeight;
+  const progress = docH > 0 ? Math.min(window.scrollY / docH, 1) : 0;
+  scrollProgressEl.style.transform = `scaleX(${progress})`;
+  progressTicking = false;
+}
+window.addEventListener('scroll', () => {
+  if (!progressTicking) {
+    requestAnimationFrame(updateScrollProgress);
+    progressTicking = true;
+  }
+}, { passive: true });
+updateScrollProgress();
+
 // ── THREE.JS: TORUS KNOT ────────────────────────────────
 const isMobile = window.innerWidth < 768;
 const canvas = document.getElementById('hero-canvas');
@@ -1454,6 +1647,46 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.15 });
 revealEls.forEach(el => observer.observe(el));
+
+// ── TERMINAL: EFECTO DE ESCRITURA ────────────────────────
+const terminalEl = document.getElementById('terminal');
+if (terminalEl) {
+  const cmdEls = terminalEl.querySelectorAll('.terminal-cmd');
+  const outEls = terminalEl.querySelectorAll('.terminal-out');
+  let terminalTyped = false;
+
+  function typeTerminal() {
+    let i = 0;
+    function typeNextCommand() {
+      if (i >= cmdEls.length) return;
+      const cmdEl = cmdEls[i];
+      const outEl = outEls[i];
+      const text = cmdEl.dataset.text || '';
+      let charIndex = 0;
+      const typeInterval = setInterval(() => {
+        cmdEl.textContent = text.slice(0, charIndex + 1);
+        charIndex++;
+        if (charIndex >= text.length) {
+          clearInterval(typeInterval);
+          if (outEl) outEl.style.opacity = '1';
+          i++;
+          setTimeout(typeNextCommand, 450);
+        }
+      }, 32);
+    }
+    typeNextCommand();
+  }
+
+  const terminalObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !terminalTyped) {
+        terminalTyped = true;
+        typeTerminal();
+      }
+    });
+  }, { threshold: 0.4 });
+  terminalObserver.observe(terminalEl);
+}
 </script>
 </body>
 </html>
