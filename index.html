@@ -1599,11 +1599,13 @@ function animate() {
   const time = performance.now() * 0.001;
 
   if (isMobile) {
-    // Móvil: sin movimiento ligado al scroll (evita releer scrollY/scrollHeight
-    // cada frame) y sin la malla wireframe extra. Solo una rotación idle
-    // barata para mantener la pieza "viva" sin el coste de la animación completa.
-    mesh.rotation.x = time * 0.15;
-    mesh.rotation.y = time * 0.1;
+    // Móvil: sin la recalculación cara de scrollHeight/progress ni la malla
+    // wireframe extra, pero SÍ con rotación idle rápida (para que se note
+    // claramente que está viva) y un término ligado a targetScrollY (ya se
+    // actualiza gratis en el listener pasivo de scroll) para que reaccione
+    // al gesto de scroll sin releer el layout cada frame.
+    mesh.rotation.x = time * 0.35;
+    mesh.rotation.y = time * 0.25 + targetScrollY * 0.0015;
   } else {
     scrollY += (targetScrollY - scrollY) * 0.05;
     const docH = document.body.scrollHeight - window.innerHeight;
@@ -1637,7 +1639,19 @@ function animate() {
   // Partículas rotan lentamente
   particles.rotation.y = time * 0.05;
 
-  renderer.render(scene, camera);
+  // Si renderer.render() falla (pérdida de contexto WebGL, GPU débil en algún
+  // móvil concreto...), el bucle seguiría llamándose cada frame pero sin pintar
+  // nunca nada nuevo: el objeto se vería "congelado" en el último frame bueno,
+  // sin ningún aviso. Con esto, al menos queda registrado y el bucle se detiene
+  // en vez de reintentar en silencio para siempre.
+  try {
+    renderer.render(scene, camera);
+  } catch (err) {
+    console.error('Three.js: fallo al renderizar, deteniendo el bucle del objeto 3D:', err);
+    canvasVisible = false;
+    rafId = null;
+    return;
+  }
 }
 rafId = requestAnimationFrame(animate);
 
