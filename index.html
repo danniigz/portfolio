@@ -504,7 +504,11 @@
   }
 
   /* GITHUB ACTIVITY */
-  .github-strip { padding: 100px 48px; text-align: center; background: var(--bg); }
+  /* position+z-index igual que las <section>: sin esto, este <div> (con fondo opaco)
+     se pinta POR DEBAJO del canvas fixed del hero (z-index:1), pese a tener background,
+     porque un elemento sin position participa en una capa de pintado anterior a
+     cualquier positioned+z-index positivo, sin importar el orden en el DOM. */
+  .github-strip { padding: 100px 48px; text-align: center; background: var(--bg); position: relative; z-index: 2; }
   .github-strip .section-label { justify-content: center; }
   .github-stats-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-top: 32px; }
   .github-stats-row img { max-width: 380px; width: 100%; height: auto; }
@@ -766,6 +770,7 @@ height: 100%;
   /* FOOTER */
   footer {
     padding: 32px 48px;
+    background: var(--bg);
     border-top: 1px solid #2c2c2c;
     display: flex;
     justify-content: space-between;
@@ -802,11 +807,15 @@ height: 100%;
   .marquee-item::before { content: '★ '; }
 
   /* TERMINAL */
+  /* position+z-index igual que las <section> (ver comentario en .github-strip):
+     necesario para que quede por encima del canvas fixed del hero, no por debajo */
   .terminal-wrap {
     padding: 90px 48px;
     display: flex;
     justify-content: center;
     background: var(--bg);
+    position: relative;
+    z-index: 2;
   }
   .terminal {
     width: 100%;
