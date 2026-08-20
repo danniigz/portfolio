@@ -510,8 +510,20 @@
      cualquier positioned+z-index positivo, sin importar el orden en el DOM. */
   .github-strip { padding: 100px 48px; text-align: center; background: var(--bg); position: relative; z-index: 2; }
   .github-strip .section-label { justify-content: center; }
-  .github-stats-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-top: 32px; }
-  .github-stats-row img { max-width: 380px; width: 100%; height: auto; }
+  .github-stats-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 48px;
+    margin: 32px 0;
+    min-height: 56px;
+  }
+  .github-stat { display: flex; flex-direction: column; gap: 4px; }
+  .github-stat-num { font-family: var(--font-display); font-size: 40px; color: var(--accent); line-height: 1; }
+  .github-stat-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .github-loading { font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: 0.5px; }
+  .github-error { font-family: var(--font-mono); font-size: 12px; color: #ff8a5c; letter-spacing: 0.5px; max-width: 420px; line-height: 1.6; }
 
   /* PROYECTOS */
   #proyectos { padding: 160px 48px; }
@@ -1197,10 +1209,10 @@ height: 100%;
 <!-- GITHUB ACTIVITY -->
 <div class="github-strip">
   <div class="section-label">Actividad en GitHub</div>
-  <div class="github-stats-row">
-    <img src="https://github-readme-stats.vercel.app/api?username=danniigz&show_icons=true&hide_border=true&bg_color=0a0a0a&title_color=d4f500&text_color=f8f8f8&icon_color=d4f500" alt="Estadísticas de GitHub de danniigz" loading="lazy">
-    <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=danniigz&hide_border=true&bg_color=0a0a0a&title_color=d4f500&text_color=f8f8f8&layout=compact" alt="Lenguajes más usados por danniigz en GitHub" loading="lazy">
+  <div class="github-stats-row" id="github-stats">
+    <div class="github-loading">Cargando actividad de GitHub…</div>
   </div>
+  <a href="https://github.com/danniigz" target="_blank" class="pbtn primary">Ver perfil completo ↗</a>
 </div>
 
 <!-- PROYECTOS -->
@@ -1696,6 +1708,40 @@ if (terminalEl) {
   }, { threshold: 0.4 });
   terminalObserver.observe(terminalEl);
 }
+
+// ── ACTIVIDAD DE GITHUB (API oficial api.github.com, sin servicios de terceros) ──
+(function loadGithubStats() {
+  const wrap = document.getElementById('github-stats');
+  if (!wrap) return;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  fetch('https://api.github.com/users/danniigz', { signal: controller.signal })
+    .then(res => {
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error('GitHub API respondió ' + res.status);
+      return res.json();
+    })
+    .then(user => {
+      const memberSince = new Date(user.created_at).getFullYear();
+      wrap.innerHTML = `
+        <div class="github-stat">
+          <span class="github-stat-num">${user.public_repos}</span>
+          <span class="github-stat-label">Repositorios públicos</span>
+        </div>
+        <div class="github-stat">
+          <span class="github-stat-num">${memberSince}</span>
+          <span class="github-stat-label">Miembro desde</span>
+        </div>
+      `;
+    })
+    .catch(err => {
+      clearTimeout(timeoutId);
+      console.error('No se pudieron cargar las estadísticas de GitHub:', err);
+      wrap.innerHTML = '<div class="github-error">No se han podido cargar las estadísticas en vivo ahora mismo. Puedes ver el perfil completo en el botón de abajo.</div>';
+    });
+})();
 </script>
 </body>
 </html>
