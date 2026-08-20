@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel Rodríguez · Dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  /* <picture> necesita ser block-level con tamaño definido para que el width:100%/height:100%
+     del <img> dentro se resuelva igual que cuando el <img> era hijo directo del contenedor */
+  picture { display: block; width: 100%; height: 100%; }
+
+  :root {
+    --bg: #050505;
+    --surface: #0f0f0f;
+    --border: #2c2c2c;
+    --accent: #d4f500;
+    --accent2: #ff4d00;
+    --text: #f8f8f8;
+    --muted: #909090;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(5,5,5,0.97), transparent);
+  }
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a {
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: opacity 0.2s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -6px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  .nav-links a:hover { opacity: 0.75; }
+  .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  /* CANVAS */
+  #hero-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  #hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    min-height: 100vh;
+  }
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+  .hero-name {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 12vw, 200px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+  .hero-name span { color: var(--accent); }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 24px;
+    font-weight: 300;
+    max-width: 400px;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    right: 48px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+  }
+
+  /* SOBRE MÍ */
+  #sobre {
+    padding: 160px 48px;
+    display: grid;
+    grid-template-columns: 260px 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .sobre-photo-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 8px;
+  }
+  .sobre-photo-wrapper {
+    position: relative;
+    width: 220px;
+    height: 280px;
+  }
+  .sobre-photo-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, var(--accent), transparent 60%);
+    z-index: 0;
+  }
+  .sobre-photo-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 60px;
+    height: 60px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    z-index: 2;
+  }
+  .sobre-photo {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: grayscale(15%);
+  }
+  .sobre-certs {
+    margin-top: 40px;
+    width: 220px;
+  }
+  .cert-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cert-label::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .cert-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e1e1e;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .cert-item:last-child { border-bottom: none; }
+  .cert-item:hover .cert-name { color: var(--accent); }
+  .cert-item:hover .cert-arrow { color: var(--accent); transform: translate(2px, -2px); }
+  .cert-icon {
+    width: 26px;
+    height: 26px;
+    border: 1px solid #2c2c2c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    background: #111;
+  }
+  .cert-text { flex: 1; min-width: 0; }
+  .cert-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+  .cert-issuer {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .cert-arrow {
+    font-size: 13px;
+    color: #404040;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--accent);
+  }
+  .sobre-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 6vw, 96px);
+    line-height: 1;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .sobre-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #d0d0d0;
+    font-weight: 300;
+  }
+  .sobre-text strong { color: var(--text); font-weight: 500; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .stat-card {
+    background: #111111;
+    border: 1px solid #2c2c2c;
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .stat-card:hover { border-color: var(--accent); }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+  .stat-card:hover::after { transform: scaleX(1); }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 64px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* HABILIDADES */
+  #skills {
+    padding: 160px 48px;
+    background: #111111;
+    border-top: 1px solid #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
+  }
+  .skills-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 80px;
+  }
+  .skills-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 120px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 2px;
+  }
+  .skill-item {
+    border: 1px solid #2c2c2c;
+    padding: 28px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    transition: all 0.25s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--accent);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 0;
+  }
+  .skill-item:hover { color: #000; border-color: var(--accent); }
+  .skill-item:hover::before { transform: translateY(0); }
+  .skill-item span { position: relative; z-index: 1; }
+  .skills-groups { display: flex; flex-direction: column; gap: 56px; }
+  .skills-group-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .skills-group-label::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+
+  /* PROYECTOS */
+  #proyectos { padding: 160px 48px; }
+  .proyectos-header { margin-bottom: 80px; }
+  .proyectos-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 120px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* PROYECTOS — LISTA EDITORIAL */
+  .pitem {
+    display: grid;
+grid-template-columns: 3fr 2fr;
+min-height: 0;
+    border-top: 1px solid #2c2c2c;
+    transition: border-color 0.3s;
+  }
+  .pitem:last-child { border-bottom: 1px solid #2c2c2c; }
+  .pitem:hover { border-color: #3c3c3c; }
+
+  .pitem-img-wrap { overflow: hidden; order: 0; display: flex; }
+  .pitem-info {
+    order: 1;
+  padding: 36px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 1px solid #2c2c2c;
+    background: #080808;
+  }
+  .pitem-rev .pitem-img-wrap { order: 1; border-left: 1px solid #2c2c2c; }
+  .pitem-rev .pitem-info { order: 0; border-left: none; }
+
+  .pitem-rev {
+  grid-template-columns: 2fr 3fr;
+}
+
+  .pitem-img {
+    width: 100%;
+height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    filter: grayscale(15%) brightness(0.85);
+    transition: transform 0.6s ease, filter 0.4s ease;
+  }
+  .pitem:hover .pitem-img { transform: scale(1.03); filter: grayscale(0%) brightness(1); }
+
+  .pitem-top { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .pitem-num {
+    font-family: var(--font-display);
+    font-size: 72px;
+    line-height: 1;
+    color: rgba(255,255,255,0.06);
+    letter-spacing: -2px;
+    user-select: none;
+  }
+  .pbadge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+  .pbadge.client { color: #00ff64; background: rgba(0,255,100,0.1); border: 1px solid rgba(0,255,100,0.25); }
+  .pbadge.personal { color: #909090; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+
+  .pitem-name {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 3.5vw, 54px);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 20px;
+    transition: color 0.3s;
+  }
+  .pitem:hover .pitem-name { color: var(--accent); }
+
+  .pitem-desc { font-size: 14px; color: #808080; line-height: 1.7; font-weight: 300; margin-bottom: 24px; max-width: 380px; }
+
+  .ptags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
+  .ptag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border: 1px solid #2c2c2c; color: #808080; }
+
+  .pbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pbtn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 9px 20px; border: 1px solid #333; color: #888; text-decoration: none; transition: all 0.2s; display: inline-block; }
+  .pbtn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .pbtn.primary { border-color: var(--accent); color: var(--accent); }
+  .pbtn.primary:hover { background: var(--accent); color: #000; }
+
+  /* Proyecto destacado (caso de estudio, TFM) — mismo sistema de color, acento distinto (--accent2) */
+  .pfeatured-wrap { margin-bottom: 72px; }
+  .pitem-featured {
+    border: 1px solid rgba(255,77,0,0.4);
+    transition: border-color 0.3s;
+  }
+  .pitem-featured .pitem-info { padding: 44px 52px; }
+  .pitem-featured .pitem-name { font-size: clamp(36px, 4vw, 60px); }
+  .pitem-featured .pitem-num { color: rgba(255,77,0,0.22); }
+  .pitem-featured:hover { border-color: rgba(255,77,0,0.7); }
+  .pitem-featured:hover .pitem-name { color: var(--accent2); }
+  .pitem-featured:hover .pitem-img { filter: grayscale(0%) brightness(1) saturate(1.1); }
+  /* Badge del destacado: mismo componente .pbadge pero un escalón más grande dentro de la
+     escala tipográfica ya existente (9px en .pbadge normal → 10px, como ya usan .pbtn/.section-label) */
+  .pbadge.featured {
+    color: var(--accent2);
+    background: rgba(255,77,0,0.12);
+    border: 1px solid rgba(255,77,0,0.3);
+    font-size: 10px;
+    padding: 5px 12px;
+  }
+  .pitem-featured .pbtn.primary { border-color: var(--accent2); color: var(--accent2); }
+  .pitem-featured .pbtn.primary:hover { background: var(--accent2); color: #000; }
+
+  /* Mini caso de estudio (Problema / Qué construí / Resultado) dentro del proyecto destacado */
+  .pcase { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; max-width: 460px; }
+  .pcase-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+  .pcase-text { font-size: 14px; color: #a8a8a8; line-height: 1.6; font-weight: 300; }
+
+  /* Subgrupo (ej. "Proyectos freelance") — mismo lenguaje visual que .skills-group-label */
+  .pgroup-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pgroup-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+
+  /* Grid compacto: prueba de ejecución, deliberadamente más pequeño que el destacado */
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2px; }
+  .pitem-compact { display: flex; flex-direction: column; border: 1px solid #2c2c2c; min-height: 0; }
+  .pitem-compact .pitem-img-wrap { height: 200px; border-left: none; }
+  .pitem-compact .pitem-info {
+    padding: 28px 26px 32px;
+    border-left: none;
+    border-top: 1px solid #2c2c2c;
+    justify-content: flex-start;
+    flex: 1;
+  }
+  .pitem-compact .pitem-top { margin-bottom: 16px; }
+  .pitem-compact .pitem-num { font-size: 40px; }
+  .pitem-compact .pitem-name { font-size: clamp(20px, 2.2vw, 26px); margin-bottom: 14px; }
+  .pitem-compact .pitem-desc { font-size: 13px; margin-bottom: 20px; max-width: none; line-height: 1.6; }
+  .pitem-compact .ptags { margin-bottom: 22px; }
+  .pitem-compact .pbtn { padding: 7px 14px; font-size: 9px; }
+
+  @media (max-width: 900px) {
+    .pitem-featured .pitem-info { padding: 36px 24px; }
+    .pitem-featured .pitem-name { font-size: clamp(32px, 8vw, 48px); }
+    .pitem, .pitem-rev { grid-template-columns: 1fr; min-height: auto; }
+    .pitem-img-wrap, .pitem-rev .pitem-img-wrap { order: 0; border-left: none; height: 240px; }
+    .pitem-info, .pitem-rev .pitem-info { order: 1; border-left: none; border-top: 1px solid #2c2c2c; padding: 36px 24px; }
+    .pitem-num { font-size: 48px; }
+    .pfeatured-wrap { margin-bottom: 48px; }
+  }
+
+  /* CONTACTO */
+  #contacto {
+    padding: 160px 48px;
+    background: #111111;
+    border-top: 1px solid #2c2c2c;
+    text-align: center;
+  }
+  .contact-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .contact-title {
+    font-family: var(--font-display);
+    font-size: clamp(60px, 10vw, 160px);
+    line-height: 0.9;
+    text-transform: uppercase;
+    margin-bottom: 64px;
+  }
+  .contact-title span { color: var(--accent); }
+  .contact-links { display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; }
+  .contact-link {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 18px 32px;
+    border: 1px solid #2c2c2c;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.25s;
+  }
+  .contact-link:hover { background: var(--accent); color: #000; border-color: var(--accent); transform: translateY(-2px); }
+  .contact-link.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+  .contact-link.primary:hover { background: transparent; color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid #2c2c2c;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  footer p { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 2px; }
+
+  /* MARQUEE */
+  .marquee-section {
+    overflow: hidden;
+    border-top: 1px solid #2c2c2c;
+    border-bottom: 1px solid #2c2c2c;
+    padding: 20px 0;
+    background: var(--accent);
+    position: relative;
+    z-index: 2;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 48px;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  .marquee-item::before { content: '★ '; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.6; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE COMPLETO ── */
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    #sobre { grid-template-columns: 1fr 1fr; gap: 48px; padding: 120px 40px; }
+    /* #sobre pasa a 2 columnas (foto | texto) aquí, pero tiene 3 hijos directos —
+       sin esto, .stats-grid caía en una 3ª columna fantasma a media anchura */
+    .stats-grid { grid-column: 1 / -1; }
+    #skills, #proyectos, #contacto { padding: 120px 40px; }
+  }
+
+  /* Móvil */
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+
+    /* NAV hamburguesa */
+    nav { padding: 16px 24px; background: rgba(5,5,5,0.99); }
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5,5,5,0.99);
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      z-index: 99;
+    }
+    .nav-links.open a { font-size: 18px; color: var(--accent); letter-spacing: 4px; }
+    .hamburger {
+      display: flex !important;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      z-index: 200;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 26px; height: 2px;
+      background: var(--accent);
+      transition: all 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* HERO */
+    #hero { padding: 0 24px 80px; }
+    .hero-name { font-size: clamp(56px, 17vw, 96px); line-height: 0.88; }
+    .hero-tag { font-size: 10px; letter-spacing: 2px; }
+    .hero-sub { font-size: 14px; max-width: 100%; margin-top: 16px; }
+    .hero-scroll { display: none; }
+    #hero-canvas { opacity: 0.5; }
+
+    /* MARQUEE */
+    .marquee-item { font-size: 18px; }
+
+    /* SOBRE */
+    #sobre { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
+    .sobre-title { font-size: clamp(40px, 13vw, 64px); }
+    .sobre-text { font-size: 15px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+    .stat-num { font-size: 48px; }
+    .stat-card { padding: 28px 20px; }
+    .section-label { font-size: 10px; }
+
+    /* SKILLS */
+    #skills { padding: 80px 24px; }
+    .skills-title { font-size: clamp(40px, 13vw, 72px); }
+    .skills-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    .skill-item { padding: 18px 14px; font-size: 12px; }
+    .skills-groups { gap: 40px; }
+    .skills-group-label { font-size: 10px; margin-bottom: 14px; }
+
+    /* PROYECTOS */
+    #proyectos { padding: 80px 24px; }
+    .proyectos-title { font-size: clamp(40px, 13vw, 72px); }
+
+    /* CONTACTO */
+    #contacto { padding: 80px 24px; }
+    .contact-title { font-size: clamp(44px, 14vw, 90px); }
+    .contact-links { flex-direction: column; align-items: stretch; gap: 2px; }
+    .contact-link { text-align: center; padding: 18px 24px; }
+
+    /* FOOTER */
+    footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
+  }
+
+  /* Móvil pequeño */
+  @media (max-width: 390px) {
+    .hero-name { font-size: 15vw; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .hamburger { display: none; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <div class="nav-logo">DRM</div>
+  <div class="nav-links" id="nav-links">
+    <a href="#sobre" onclick="closeMenu()">Sobre mí</a>
+    <a href="#skills" onclick="closeMenu()">Skills</a>
+    <a href="#proyectos" onclick="closeMenu()">Proyectos</a>
+    <a href="#contacto" onclick="closeMenu()">Contacto</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<canvas id="hero-canvas"></canvas>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-tag">Fullstack Developer · Desarrollo de Software con IA</div>
+  <h1 class="hero-name">Daniel<br><span>Rodríguez</span></h1>
+  <p class="hero-sub">Desarrollo aplicaciones web de principio a fin, integrando IA en cada etapa del proceso. Frontend que enamora, backend que funciona.</p>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">HTML & CSS</span>
+    <span class="marquee-item">JavaScript</span>
+    <span class="marquee-item">PHP</span>
+    <span class="marquee-item">Java</span>
+    <span class="marquee-item">SQL</span>
+    <span class="marquee-item">REST APIs</span>
+    <span class="marquee-item">Fullstack Dev</span>
+    <span class="marquee-item">HTML & CSS</span>
+    <span class="marquee-item">JavaScript</span>
+    <span class="marquee-item">PHP</span>
+    <span class="marquee-item">Java</span>
+    <span class="marquee-item">SQL</span>
+    <span class="marquee-item">REST APIs</span>
+    <span class="marquee-item">Fullstack Dev</span>
+  </div>
+</div>
+
+<!-- SOBRE MÍ -->
+<section id="sobre">
+  <div class="sobre-photo-col reveal">
+    <div class="sobre-photo-wrapper">
+      <picture>
+        <source srcset="imagenes/dani.webp" type="image/webp">
+        <img src="imagenes/dani.png" alt="Daniel Rodríguez Machado" class="sobre-photo" width="700" height="1050">
+      </picture>
+    </div>
+    <div class="sobre-certs">
+      <div class="cert-label">Certificaciones</div>
+      <a href="Certificado_Master_BigSchool.pdf" target="_blank" class="cert-item">
+        <div class="cert-icon">B</div>
+        <div class="cert-text">
+          <span class="cert-name">Máster en Desarrollo de Software con IA</span>
+          <span class="cert-issuer">BIG School · 2026</span>
+        </div>
+        <span class="cert-arrow">↗</span>
+      </a>
+      <a href="https://coursera.org/verify/specialization/MFX50C4RXKHK" target="_blank" class="cert-item">
+        <div class="cert-icon">G</div>
+        <div class="cert-text">
+          <span class="cert-name">Google AI Essentials</span>
+          <span class="cert-issuer">Google · Coursera · 2026</span>
+        </div>
+        <span class="cert-arrow">↗</span>
+      </a>
+      <a href="cert_mouredev.pdf" target="_blank" class="cert-item">
+        <div class="cert-icon">{m}</div>
+        <div class="cert-text">
+          <span class="cert-name">Desarrollo con IA</span>
+          <span class="cert-issuer">MoureDev · BIG School · 2026</span>
+        </div>
+        <span class="cert-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+  <div class="reveal">
+    <div class="section-label">Sobre mí</div>
+    <h2 class="sobre-title">Quién<br>soy</h2>
+    <p class="sobre-text">
+      Soy <strong>Daniel Rodríguez Machado</strong>, desarrollador web fullstack freelance con proyectos reales en producción. Me apasiona construir productos digitales que no solo funcionen bien, sino que también se vean increíbles.<br><br>
+      Además, tengo un <strong>Máster en Desarrollo de Software con IA</strong>, especializado en arquitectura de sistemas, IA generativa y buenas prácticas de ingeniería — y disfruto especialmente cuando <strong>frontend</strong>, <strong>backend</strong> e <strong>IA</strong> se conectan de forma limpia y eficiente.
+    </p>
+  </div>
+  <div class="stats-grid reveal">
+    <div class="stat-card">
+      <div class="stat-num">2+</div>
+      <div class="stat-label">Años formándome</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">5+</div>
+      <div class="stat-label">Proyectos reales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">20+</div>
+      <div class="stat-label">Tecnologías</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Ganas de aprender</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-header reveal">
+    <div>
+      <div class="section-label">Stack técnico</div>
+      <h2 class="skills-title">Mis<br>Skills</h2>
+    </div>
+  </div>
+  <div class="skills-groups">
+    <div class="reveal">
+      <div class="skills-group-label">Core</div>
+      <div class="skills-grid">
+        <div class="skill-item"><span>HTML5</span></div>
+        <div class="skill-item"><span>CSS3</span></div>
+        <div class="skill-item"><span>Bootstrap</span></div>
+        <div class="skill-item"><span>JavaScript (ES6+)</span></div>
+        <div class="skill-item"><span>PHP</span></div>
+        <div class="skill-item"><span>Laravel</span></div>
+        <div class="skill-item"><span>Java</span></div>
+        <div class="skill-item"><span>MySQL</span></div>
+        <div class="skill-item"><span>Git / GitHub</span></div>
+        <div class="skill-item"><span>REST API</span></div>
+        <div class="skill-item"><span>Responsive Design</span></div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="skills-group-label">IA & Arquitectura</div>
+      <div class="skills-grid">
+        <div class="skill-item"><span>LangChain</span></div>
+        <div class="skill-item"><span>RAG</span></div>
+        <div class="skill-item"><span>Prompt Engineering</span></div>
+        <div class="skill-item"><span>LLMOps</span></div>
+        <div class="skill-item"><span>Clean Architecture</span></div>
+        <div class="skill-item"><span>MVC Pattern</span></div>
+        <div class="skill-item"><span>Docker</span></div>
+        <div class="skill-item"><span>CI/CD</span></div>
+        <div class="skill-item"><span>OWASP / Seguridad</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROYECTOS -->
+<section id="proyectos">
+  <div class="proyectos-header reveal">
+    <div class="section-label">Trabajo</div>
+    <h2 class="proyectos-title">Mis<br>Proyectos</h2>
+  </div>
+
+  <!-- Caso de estudio destacado -->
+  <div class="pfeatured-wrap reveal">
+    <div class="pitem pitem-rev pitem-featured">
+      <div class="pitem-img-wrap">
+        <picture>
+          <source srcset="imagenes/capAirecruit.webp" type="image/webp">
+          <img src="imagenes/capAirecruit.png" alt="AIRecruit" class="pitem-img" loading="lazy" width="1600" height="847">
+        </picture>
+      </div>
+      <div class="pitem-info">
+        <div class="pitem-top">
+          <span class="pitem-num">00</span>
+          <span class="pbadge featured">TFM Máster</span>
+        </div>
+        <h3 class="pitem-name">AIRecruit</h3>
+        <div class="pcase">
+          <div class="pcase-row">
+            <span class="pcase-label">Problema</span>
+            <p class="pcase-text">Sistema multiagente de IA aplicado a selección de personal.</p>
+          </div>
+          <div class="pcase-row">
+            <span class="pcase-label">Qué construí</span>
+            <p class="pcase-text">Implementa RAG y LangChain para automatizar el análisis y matching de candidatos.</p>
+          </div>
+          <div class="pcase-row">
+            <span class="pcase-label">Resultado</span>
+            <p class="pcase-text">Desarrollado como Trabajo Final del Máster en Desarrollo de Software con IA (BIG School), aprobado con valoración positiva.</p>
+          </div>
+        </div>
+        <div class="ptags">
+          <span class="ptag">LangChain</span>
+          <span class="ptag">RAG</span>
+          <span class="ptag">Multi-Agent</span>
+          <span class="ptag">Python</span>
+          <span class="ptag">Docker</span>
+        </div>
+        <div class="pbtns">
+          <a href="https://airecruit-production.up.railway.app/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+          <a href="https://github.com/danniigz/airecruit" target="_blank" class="pbtn">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid compacto: proyectos freelance -->
+  <div class="pgroup">
+    <div class="pgroup-label reveal">Proyectos freelance</div>
+    <div class="pgrid">
+
+      <!-- 01 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
+          <picture>
+            <source srcset="imagenes/capConstCham.webp" type="image/webp">
+            <img src="imagenes/capConstCham.png" alt="Construcciones Chamusinos" class="pitem-img" loading="lazy" width="1600" height="859">
+          </picture>
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">01</span>
+            <span class="pbadge client">Cliente real</span>
+          </div>
+          <h3 class="pitem-name">Construcciones<br>Chamusinos</h3>
+          <p class="pitem-desc">Web corporativa para empresa real de construcción. Diseño, maquetación y UX desde cero con enfoque en conversión y presencia profesional.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+            <span class="ptag">Responsive</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://construccioneschamusinos.es" target="_blank" class="pbtn primary">Ver web ↗</a>
+            <a href="https://github.com/danniigz/ConstruccionesChamusinos" target="_blank" class="pbtn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
+          <picture>
+            <source srcset="imagenes/capCalcuFacil.webp" type="image/webp">
+            <img src="imagenes/capCalcuFacil.png" alt="CalcuFácil" class="pitem-img" loading="lazy" width="1600" height="861">
+          </picture>
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">02</span>
+            <span class="pbadge personal">Proyecto personal</span>
+          </div>
+          <h3 class="pitem-name">CalcuFácil</h3>
+          <p class="pitem-desc">Plataforma de calculadoras financieras en español. SEO optimizado, dominio propio y monetización con AdSense.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+            <span class="ptag">SEO</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://calcufacil.es" target="_blank" class="pbtn primary">Ver web ↗</a>
+            <a href="https://github.com/danniigz/calcufacil" target="_blank" class="pbtn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
+          <picture>
+            <source srcset="imagenes/capCineVerse.webp" type="image/webp">
+            <img src="imagenes/capCineVerse.png" alt="CineVerse" class="pitem-img" loading="lazy" width="1600" height="854">
+          </picture>
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">03</span>
+            <span class="pbadge personal">Proyecto personal</span>
+          </div>
+          <h3 class="pitem-name">CineVerse</h3>
+          <p class="pitem-desc">App de catálogo de películas estilo streaming. Búsqueda, filtros y fichas de contenido detalladas.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://danniigz.github.io/CineVerse1/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+            <a href="https://github.com/danniigz/CineVerse1" target="_blank" class="pbtn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
+          <picture>
+            <source srcset="imagenes/capZonaCero.webp" type="image/webp">
+            <img src="imagenes/capZonaCero.png" alt="Zona Cero Barbershop" class="pitem-img" loading="lazy" width="1600" height="851">
+          </picture>
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">04</span>
+            <span class="pbadge personal">Proyecto personal</span>
+          </div>
+          <h3 class="pitem-name">Zona Cero<br>Barbershop</h3>
+          <p class="pitem-desc">Demo para barbería local. Estética cinematográfica en blanco y negro con animaciones hero y diseño mobile-first.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://zonacerodemo.netlify.app/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="contact-label">¿Hablamos?</div>
+  <h2 class="contact-title reveal">Let's<br><span>Work</span><br>Together</h2>
+  <div class="contact-links reveal">
+    <a href="mailto:drodriguez.daw@gmail.com" class="contact-link primary">Email</a>
+    <a href="https://www.linkedin.com/in/daniel-rodriguez-machado/" target="_blank" class="contact-link">LinkedIn</a>
+    <a href="https://github.com/danniigz" target="_blank" class="contact-link">GitHub</a>
+    <a href="cv_daniel_rodriguez.pdf" download class="contact-link">CV PDF</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Daniel Rodríguez Machado</p>
+  <p>Diseñado & Desarrollado con 🖤</p>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── MENÚ HAMBURGUESA ────────────────────────────────────
+const hamburger = document.getElementById('hamburger');
+const navLinks  = document.getElementById('nav-links');
+
+function closeMenu() {
+  hamburger.classList.remove('open');
+  navLinks.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+  document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
+});
+
+// ── CURSOR ──────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+(function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+document.querySelectorAll('a, button, .project-card, .skill-item').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '24px'; cursor.style.height = '24px';
+    ring.style.width = '60px'; ring.style.height = '60px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '12px'; cursor.style.height = '12px';
+    ring.style.width = '40px'; ring.style.height = '40px';
+  });
+});
+
+// ── THREE.JS: TORUS KNOT ────────────────────────────────
+const isMobile = window.innerWidth < 768;
+const canvas = document.getElementById('hero-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !isMobile });
+renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 5;
+
+// Geometría: torus knot (menos segmentos en móvil para mejor rendimiento)
+const geo = isMobile
+  ? new THREE.TorusKnotGeometry(1.0, 0.3, 80, 12, 2, 3)
+  : new THREE.TorusKnotGeometry(1.2, 0.35, 200, 24, 2, 3);
+const mat = new THREE.MeshStandardMaterial({
+  color: 0xe8ff00,
+  metalness: 0.8,
+  roughness: 0.1,
+});
+const mesh = new THREE.Mesh(geo, mat);
+scene.add(mesh);
+
+// Wireframe overlay (se omite en móvil: es una segunda malla completa que duplica el coste de dibujado)
+let wireMesh = null;
+if (!isMobile) {
+  const wireMat = new THREE.MeshBasicMaterial({
+    color: 0xe8ff00,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.08,
+  });
+  wireMesh = new THREE.Mesh(geo, wireMat);
+  scene.add(wireMesh);
+}
+
+// Lights
+const amb = new THREE.AmbientLight(0xffffff, 0.2);
+scene.add(amb);
+const point1 = new THREE.PointLight(0xe8ff00, 3, 20);
+point1.position.set(3, 3, 3);
+scene.add(point1);
+const point2 = new THREE.PointLight(0xff4d00, 2, 20);
+point2.position.set(-3, -2, 2);
+scene.add(point2);
+const dLight = new THREE.DirectionalLight(0xffffff, 0.5);
+dLight.position.set(0, 5, 5);
+scene.add(dLight);
+
+// Particle field
+const partGeo = new THREE.BufferGeometry();
+const partCount = isMobile ? 150 : 500;
+const positions = new Float32Array(partCount * 3);
+for (let i = 0; i < partCount * 3; i++) positions[i] = (Math.random() - 0.5) * 30;
+partGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const partMat = new THREE.PointsMaterial({ color: 0xe8ff00, size: 0.04, transparent: true, opacity: 0.3 });
+const particles = new THREE.Points(partGeo, partMat);
+scene.add(particles);
+
+// Scroll
+// El listener solo guarda el valor crudo (sin cálculos pesados); el suavizado e
+// interpolación ocurre dentro del bucle de requestAnimationFrame en animate().
+let scrollY = 0, targetScrollY = 0;
+const totalSections = 5;
+window.addEventListener('scroll', () => { targetScrollY = window.scrollY; }, { passive: true });
+
+// Mouse parallax (desktop) + touch parallax (móvil)
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', e => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+// Touch parallax para móvil
+document.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  mouseX = (t.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (t.clientY / window.innerHeight - 0.5) * 2;
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+let rafId = null;
+let canvasVisible = true;
+
+function animate() {
+  // Si ninguna de las secciones "transparentes" (donde el canvas se ve detrás)
+  // está en pantalla, no se programa el siguiente frame: el bucle se para
+  // hasta que el IntersectionObserver de más abajo lo reactive.
+  if (!canvasVisible) { rafId = null; return; }
+  rafId = requestAnimationFrame(animate);
+  const time = performance.now() * 0.001;
+
+  if (isMobile) {
+    // Móvil: sin movimiento ligado al scroll (evita releer scrollY/scrollHeight
+    // cada frame) y sin la malla wireframe extra. Solo una rotación idle
+    // barata para mantener la pieza "viva" sin el coste de la animación completa.
+    mesh.rotation.x = time * 0.15;
+    mesh.rotation.y = time * 0.1;
+  } else {
+    scrollY += (targetScrollY - scrollY) * 0.05;
+    const docH = document.body.scrollHeight - window.innerHeight;
+    const progress = Math.min(scrollY / docH, 1);
+
+    // Posición: se mueve por la pantalla con el scroll
+    mesh.position.x = wireMesh.position.x = -Math.sin(progress * Math.PI * 2) * 2.5;
+    mesh.position.y = wireMesh.position.y = Math.cos(progress * Math.PI * 2.5) * 1.5;
+
+    // Rotación driven by scroll + tiempo
+    mesh.rotation.x = wireMesh.rotation.x = progress * Math.PI * 6 + time * 0.3;
+    mesh.rotation.y = wireMesh.rotation.y = progress * Math.PI * 4 + time * 0.2;
+    mesh.rotation.z = wireMesh.rotation.z = Math.sin(progress * Math.PI * 3) * Math.PI;
+
+    // Escala con pulso suave
+    const scale = 1 + Math.sin(time * 1.5) * 0.05;
+    mesh.scale.setScalar(scale);
+    wireMesh.scale.setScalar(scale);
+
+    // Color cambia con el scroll
+    const h = progress * 0.15;
+    mat.color.setHSL(h, 1, 0.55);
+    point1.color.setHSL(h, 1, 0.55);
+
+    // Parallax con ratón
+    camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+    camera.position.y += (-mouseY * 0.3 - camera.position.y) * 0.05;
+    camera.lookAt(scene.position);
+  }
+
+  // Partículas rotan lentamente
+  particles.rotation.y = time * 0.05;
+
+  renderer.render(scene, camera);
+}
+rafId = requestAnimationFrame(animate);
+
+// Pausa el render loop cuando el usuario está sobre una sección con fondo opaco
+// (#skills, #contacto, que tapan el canvas por completo) y lo reanuda al entrar
+// en cualquier sección "transparente" donde el objeto 3D sigue siendo visible
+// de fondo (#hero, #sobre, #proyectos — ninguna de ellas define background propio).
+// Importante: se vigilan las tres, no solo #hero, porque el objeto acompaña todo
+// el scroll (progress se calcula sobre document.body.scrollHeight, no solo el hero).
+const visibleCanvasSections = new Set();
+const canvasObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) visibleCanvasSections.add(entry.target);
+    else visibleCanvasSections.delete(entry.target);
+  });
+  canvasVisible = visibleCanvasSections.size > 0;
+  if (canvasVisible && rafId === null) {
+    rafId = requestAnimationFrame(animate);
+  }
+}, { threshold: 0 });
+document.querySelectorAll('#hero, #sobre, #proyectos').forEach(section => canvasObserver.observe(section));
+
+// ── SCROLL REVEAL ────────────────────────────────────────
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+revealEls.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
