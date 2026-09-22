@@ -606,6 +606,7 @@ height: 100%;
   }
   .pbadge.client { color: #00ff64; background: rgba(0,255,100,0.1); border: 1px solid rgba(0,255,100,0.25); }
   .pbadge.personal { color: #909090; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+  .pbadge.dev { color: var(--accent2); background: rgba(255,77,0,0.1); border: 1px solid rgba(255,77,0,0.25); }
 
   .pitem-name {
     font-family: var(--font-display);
@@ -628,6 +629,21 @@ height: 100%;
   .pbtn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
   .pbtn.primary { border-color: var(--accent); color: var(--accent); }
   .pbtn.primary:hover { background: var(--accent); color: #000; }
+  .pbtn.disabled { opacity: 0.4; pointer-events: none; }
+
+  .pitem-img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+  }
+  .placeholder-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
   /* Proyecto destacado (caso de estudio, TFM) — mismo sistema de color, acento distinto (--accent2) */
   .pfeatured-wrap { margin-bottom: 72px; }
@@ -1032,7 +1048,7 @@ height: 100%;
   <div class="hero-bottom-row">
     <div class="hero-proof">
       <div class="hero-proof-item">
-        <span class="hero-proof-num">5+</span>
+        <span class="hero-proof-num">10+</span>
         <span class="hero-proof-label">Proyectos reales</span>
       </div>
       <div class="hero-proof-item">
@@ -1144,11 +1160,11 @@ height: 100%;
   </div>
   <div class="stats-grid reveal">
     <div class="stat-card">
-      <div class="stat-num">2+</div>
+      <div class="stat-num">3+</div>
       <div class="stat-label">Años formándome</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num">5+</div>
+      <div class="stat-num">10+</div>
       <div class="stat-label">Proyectos reales</div>
     </div>
     <div class="stat-card">
@@ -1197,6 +1213,7 @@ height: 100%;
         <div class="skill-item"><span>Clean Architecture</span></div>
         <div class="skill-item"><span>MVC Pattern</span></div>
         <div class="skill-item"><span>Docker</span></div>
+        <div class="skill-item"><span>Cloud (Azure / AWS / GCP)</span></div>
         <div class="skill-item"><span>CI/CD</span></div>
         <div class="skill-item"><span>OWASP / Seguridad</span></div>
       </div>
@@ -1309,6 +1326,53 @@ height: 100%;
       <!-- 02 -->
       <div class="pitem pitem-compact reveal">
         <div class="pitem-img-wrap">
+          <img src="imagenes/capTintoreria.png" alt="Tintorería Verín" class="pitem-img" loading="lazy" width="1600" height="900">
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">02</span>
+            <span class="pbadge client">Cliente real</span>
+          </div>
+          <h3 class="pitem-name">Tintorería<br>Verín</h3>
+          <p class="pitem-desc">Web para una tintorería local en Verín, con servicios, horarios y contacto.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://tintoreriaverin.es" target="_blank" class="pbtn primary">Ver web ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
+          <img src="imagenes/capCumbrera.png" alt="Cumbrera" class="pitem-img" loading="lazy" width="1600" height="900">
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">03</span>
+            <span class="pbadge client">Cliente real</span>
+          </div>
+          <h3 class="pitem-name">Cumbrera</h3>
+          <p class="pitem-desc">Web para una empresa de limpieza de tejados con sección de electricidad y contacto directo por WhatsApp.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://danniigz.github.io/cumbrera/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+            <a href="https://github.com/danniigz/cumbrera" target="_blank" class="pbtn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
           <picture>
             <source srcset="imagenes/capCalcuFacil.webp" type="image/webp">
             <img src="imagenes/capCalcuFacil.png" alt="CalcuFácil" class="pitem-img" loading="lazy" width="1600" height="861">
@@ -1316,7 +1380,7 @@ height: 100%;
         </div>
         <div class="pitem-info">
           <div class="pitem-top">
-            <span class="pitem-num">02</span>
+            <span class="pitem-num">04</span>
             <span class="pbadge personal">Proyecto personal</span>
           </div>
           <h3 class="pitem-name">CalcuFácil</h3>
@@ -1344,7 +1408,7 @@ height: 100%;
         </div>
         <div class="pitem-info">
           <div class="pitem-top">
-            <span class="pitem-num">03</span>
+            <span class="pitem-num">05</span>
             <span class="pbadge personal">Proyecto personal</span>
           </div>
           <h3 class="pitem-name">CineVerse</h3>
@@ -1371,7 +1435,7 @@ height: 100%;
         </div>
         <div class="pitem-info">
           <div class="pitem-top">
-            <span class="pitem-num">04</span>
+            <span class="pitem-num">06</span>
             <span class="pbadge personal">Proyecto personal</span>
           </div>
           <h3 class="pitem-name">Zona Cero<br>Barbershop</h3>
@@ -1383,6 +1447,49 @@ height: 100%;
           </div>
           <div class="pbtns">
             <a href="https://zonacerodemo.netlify.app/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 07 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap">
+          <img src="imagenes/capHPQuiz.png" alt="Quiz de Harry Potter" class="pitem-img" loading="lazy" width="1600" height="900">
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">07</span>
+            <span class="pbadge personal">Proyecto personal</span>
+          </div>
+          <h3 class="pitem-name">Quiz de<br>Harry Potter</h3>
+          <p class="pitem-desc">Mini-web interactiva de Harry Potter: quiz de trivia + selector de casa estilo Sombrero Seleccionador, con ranking y diseño mágico animado.</p>
+          <div class="ptags">
+            <span class="ptag">HTML</span>
+            <span class="ptag">CSS</span>
+            <span class="ptag">JavaScript</span>
+          </div>
+          <div class="pbtns">
+            <a href="https://danniigz.github.io/Harry-Potter-Quiz/" target="_blank" class="pbtn primary">Ver demo ↗</a>
+            <a href="https://github.com/danniigz/Harry-Potter-Quiz" target="_blank" class="pbtn">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 08 -->
+      <div class="pitem pitem-compact reveal">
+        <div class="pitem-img-wrap pitem-img-placeholder">
+          <span class="placeholder-label">Captura próximamente</span>
+        </div>
+        <div class="pitem-info">
+          <div class="pitem-top">
+            <span class="pitem-num">08</span>
+            <span class="pbadge dev">En desarrollo</span>
+          </div>
+          <h3 class="pitem-name">Noitebela</h3>
+          <p class="pitem-desc">Ecommerce en desarrollo para un negocio de Xinzo de Limia.</p>
+          <div class="pbtns">
+            <span class="pbtn disabled">Ver demo ↗</span>
+            <span class="pbtn disabled">GitHub</span>
           </div>
         </div>
       </div>
